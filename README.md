@@ -1,8 +1,8 @@
 # Public Transit Status with Apache Kafka
 
-In this project, you will construct a streaming event pipeline around Apache Kafka and its ecosystem. Using public data from the [Chicago Transit Authority](https://www.transitchicago.com/data/) we will construct an event pipeline around Kafka that allows us to simulate and display the status of train lines in real time.
+In this project, I constructed a streaming event pipeline around Apache Kafka and its ecosystem. Using public data from the [Chicago Transit Authority](https://www.transitchicago.com/data/) I constructed an event pipeline around Kafka that can simulate and display the status of train lines in real time.
 
-When the project is complete, you will be able to monitor a website to watch trains move from station to station.
+When running the simulation, you will be able to monitor a website to watch trains move from station to station.
 
 ![Final User Interface](images/ui.png)
 
@@ -19,17 +19,18 @@ The following are required to complete this project:
 
 The Chicago Transit Authority (CTA) has asked us to develop a dashboard displaying system status for its commuters. We have decided to use Kafka and ecosystem tools like REST Proxy and Kafka Connect to accomplish this task.
 
-Our architecture will look like so:
+The architecture looks like so:
 
 ![Project Architecture](images/diagram.png)
 
+Udacity provided the base architecture for the project. And i carried out the following steps to setup and finish the project.
 ### Step 1: Create Kafka Producers
-The first step in our plan is to configure the train stations to emit some of the events that we need. The CTA has placed a sensor on each side of every train station that can be programmed to take an action whenever a train arrives at the station.
+The first step in the plan was to configure the train stations to emit some of the events that we need. The CTA has placed a sensor on each side of every train station that can be programmed to take an action whenever a train arrives at the station.
 
-To accomplish this, you must complete the following tasks:
+To accomplish this, you completed the following tasks:
 
-1. Complete the code in `producers/models/producer.py`
-1. Define a `value` schema for the arrival event in `producers/models/schemas/arrival_value.json` with the following attributes
+1. Completed the code in `producers/models/producer.py`
+1. Defined a `value` schema for the arrival event in `producers/models/schemas/arrival_value.json` with the following attributes
 	* `station_id`
 	* `train_id`
 	* `direction`
@@ -37,20 +38,20 @@ To accomplish this, you must complete the following tasks:
 	* `train_status`
 	* `prev_station_id`
 	* `prev_direction`
-1. Complete the code in `producers/models/station.py` so that:
+1. Completed the code in `producers/models/station.py` so that:
 	* A topic is created for each station in Kafka to track the arrival events
 	* The station emits an `arrival` event to Kafka whenever the `Station.run()` function is called.
 	* Ensure that events emitted to kafka are paired with the Avro `key` and `value` schemas
-1. Define a `value` schema for the turnstile event in `producers/models/schemas/turnstile_value.json` with the following attributes
+1. Defined a `value` schema for the turnstile event in `producers/models/schemas/turnstile_value.json` with the following attributes
 	* `station_id`
 	* `station_name`
 	* `line`
-1. Complete the code in `producers/models/turnstile.py` so that:
+1. Completed the code in `producers/models/turnstile.py` so that:
 	* A topic is created for each turnstile for each station in Kafka to track the turnstile events
 	* The station emits a `turnstile` event to Kafka whenever the `Turnstile.run()` function is called.
 	* Ensure that events emitted to kafka are paired with the Avro `key` and `value` schemas
 
-### Step 2: Configure Kafka REST Proxy Producer
+### Step 2: Configured Kafka REST Proxy Producer
 Our partners at the CTA have asked that we also send weather readings into Kafka from their weather hardware. Unfortunately, this hardware is old and we cannot use the Python Client Library due to hardware restrictions. Instead, we are going to use HTTP REST to send the data to Kafka from the hardware using Kafka's REST Proxy.
 
 To accomplish this, you must complete the following tasks:
@@ -64,7 +65,7 @@ To accomplish this, you must complete the following tasks:
 		* **NOTE**: When sending HTTP requests to Kafka REST Proxy, be careful to include the correct `Content-Type`. Pay close attention to the [examples in the documentation](https://docs.confluent.io/current/kafka-rest/api.html#post--topics-(string-topic_name)) for more information.
 	* Ensure that events emitted to REST Proxy are paired with the Avro `key` and `value` schemas
 
-### Step 3: Configure Kafka Connect
+### Step 3: Configured Kafka Connect
 Finally, we need to extract station information from our PostgreSQL database into Kafka. We've decided to use the [Kafka JDBC Source Connector](https://docs.confluent.io/current/connect/kafka-connect-jdbc/source-connector/index.html).
 
 To accomplish this, you must complete the following tasks:
@@ -75,7 +76,7 @@ To accomplish this, you must complete the following tasks:
 	* Make sure to use the [Landoop Kafka Connect UI](http://localhost:8084) and [Landoop Kafka Topics UI](http://localhost:8085) to check the status and output of the Connector.
 	* To delete a misconfigured connector: `CURL -X DELETE localhost:8083/connectors/stations`
 
-### Step 4: Configure the Faust Stream Processor
+### Step 4: Configured the Faust Stream Processor
 We will leverage Faust Stream Processing to transform the raw Stations table that we ingested from Kafka Connect. The raw format from the database has more data than we need, and the line color information is not conveniently configured. To remediate this, we're going to ingest data from our Kafka Connect topic, and transform the data.
 
 To accomplish this, you must complete the following tasks:
@@ -88,7 +89,7 @@ You must run this Faust processing application with the following command:
 
 `faust -A faust_stream worker -l info`
 
-### Step 5: Configure the KSQL Table
+### Step 5: Configured the KSQL Table
 Next, we will use KSQL to aggregate turnstile data for each of our stations. Recall that when we produced turnstile data, we simply emitted an event, not a count. What would make this data more useful would be to summarize it by station so that downstream applications always have an up-to-date count
 
 To accomplish this, you must complete the following tasks:
@@ -102,7 +103,7 @@ To accomplish this, you must complete the following tasks:
 * Made a mistake in table creation? `DROP TABLE <your_table>`. If the CLI asks you to terminate a running query, you can `TERMINATE <query_name>`
 
 
-### Step 6: Create Kafka Consumers
+### Step 6: Created Kafka Consumers
 With all of the data in Kafka, our final task is to consume the data in the web server that is going to serve the transit status pages to our commuters.
 
 To accomplish this, you must complete the following tasks:
