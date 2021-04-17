@@ -37,29 +37,21 @@ class KafkaConsumer:
         #
         #
         self.broker_properties = {
-            "broker.urls": "PLAINTEXT://localhost:9092, PLAINTEXT://localhost:9093, PLAINTEXT://localhost:9094"
+            "bootstrap.servers": "PLAINTEXT://localhost:9092, PLAINTEXT://localhost:9093, PLAINTEXT://localhost:9094",
+            "auto.offset.reset": "earliest" if offset_earliest else "latest",
+            "group.id": "0",
         }
 
         # TODO: Create the Consumer, using the appropriate type.
         if is_avro is True:
             self.broker_properties["schema.registry.url"] = "http://localhost:8081"
-            self.consumer = AvroConsumer(
-                {
-                    "bootstrap.servers": self.broker_properties["broker.urls"],
-                    "auto.offset.reset": "earliest" if offset_earliest else "latest",
-                    "group.id": "0",
-                },
+            self.consumer = AvroConsumer(self.broker_properties,
                 schema_registry=CachedSchemaRegistryClient(
                     self.broker_properties["schema.registry.url"],
                 ),
             )
         else:
-            self.consumer = Consumer(
-                {
-                    "bootstrap.servers": self.broker_properties["broker.urls"],
-                    "auto.offset.reset": "earliest" if offset_earliest else "latest",
-                    "group.id": "0",
-                }
+            self.consumer = Consumer(self.broker_properties
             )
 
         #
