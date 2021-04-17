@@ -37,16 +37,30 @@ class KafkaConsumer:
         #
         #
         self.broker_properties = {
-            "broker.urls": "PLAINTEXT://localhost:9092, PLAINTEXT://localhost:9093, PLAINTEXT://localhost:9094"}
+            "broker.urls": "PLAINTEXT://localhost:9092, PLAINTEXT://localhost:9093, PLAINTEXT://localhost:9094"
+        }
 
         # TODO: Create the Consumer, using the appropriate type.
         if is_avro is True:
             self.broker_properties["schema.registry.url"] = "http://localhost:8081"
-            self.consumer = AvroConsumer({"bootstrap.servers": self.broker_properties["broker.urls"], "auto.offset.reset": "earliest" if offset_earliest else "latest", "group.id": "0"},
-            schema_registry= CachedSchemaRegistryClient(self.broker_properties["schema.registry.url"],), 
+            self.consumer = AvroConsumer(
+                {
+                    "bootstrap.servers": self.broker_properties["broker.urls"],
+                    "auto.offset.reset": "earliest" if offset_earliest else "latest",
+                    "group.id": "0",
+                },
+                schema_registry=CachedSchemaRegistryClient(
+                    self.broker_properties["schema.registry.url"],
+                ),
             )
         else:
-            self.consumer = Consumer({"bootstrap.servers": self.broker_properties["broker.urls"], "auto.offset.reset": "earliest" if offset_earliest else "latest", "group.id": "0"})
+            self.consumer = Consumer(
+                {
+                    "bootstrap.servers": self.broker_properties["broker.urls"],
+                    "auto.offset.reset": "earliest" if offset_earliest else "latest",
+                    "group.id": "0",
+                }
+            )
 
         #
         #
@@ -54,7 +68,7 @@ class KafkaConsumer:
         # how the `on_assign` callback should be invoked.
         #
         #
-        self.consumer.subscribe([topic_name_pattern], on_assign = self.on_assign)
+        self.consumer.subscribe([topic_name_pattern], on_assign=self.on_assign)
 
     def on_assign(self, consumer, partitions):
         """Callback for when topic assignment takes place"""
@@ -83,7 +97,7 @@ class KafkaConsumer:
         # Additionally, make sure you return 1 when a message is processed, and 0 when no message
         # is retrieved.
         #
-        
+
         message = self.consumer.poll(timeout=1.0)
         if message is None:
             return 0
@@ -94,7 +108,6 @@ class KafkaConsumer:
             logger.info(message.topic())
             self.message_handler(message)
             return 1
-
 
     def close(self):
         """Cleans up any open kafka consumers"""

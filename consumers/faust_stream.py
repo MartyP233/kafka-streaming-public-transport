@@ -50,13 +50,13 @@ table = app.Table(
 @app.agent(topic)
 async def station(stations):
     async for station in stations:
-        transformed = TransformedStation(
+        table[station.station_id] = TransformedStation(
             station_id= station.station_id,
             station_name=station.station_name,
             order=station.order,
             line= 'red' if station.red else 'blue' if station.blue else 'green' if station.green else ''
         )
-        await out_topic.send(key=str(station.station_id), value=transformed)
+        await out_topic.send(key=str(station.station_id), value=table[station.station_id])
 
 
 #
